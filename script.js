@@ -89,4 +89,25 @@ const currencies = new Map([
 
 const movements = [200, 450, -400, 3000, -650, -130, 70, 1300];
 
-/////////////////////////////////////////////////
+const movementsDesc = movements.map((movement, idx) => {
+  const msg = movement > 0 ?  `You deposited ${movement}` : `You withdrew ${Math.abs(movement)}`;
+  return `Transaction ${idx + 1}: ${msg}`;
+});
+
+const createUsernames = (accounts) => {
+  accounts.forEach((account) => {
+    const nameArr = account.owner.toLowerCase().split(' ');
+    const username = nameArr.map((name, idx) => {
+      if (idx === nameArr.length - 1) {
+        return name;
+      } else if (idx === 0) {
+        return name[0];
+      }
+    }).join('');
+
+    account.username = username;
+  })
+}
+
+console.log(createUsernames(accounts))
+console.log(accounts)
