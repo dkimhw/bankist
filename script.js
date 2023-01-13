@@ -77,6 +77,33 @@ const displayMovements = (movements) => {
 
 displayMovements(account1.movements);
 
+const calcDisplayPrintBalance = (movements) => {
+  const balance = movements.reduce((acc, curr) => {
+    return acc + curr;
+  }, 0);
+
+  labelBalance.textContent = `${balance} EUR`;
+}
+
+calcDisplayPrintBalance(account1.movements);
+
+const createUsernames = (accounts) => {
+  accounts.forEach((account) => {
+    const nameArr = account.owner.toLowerCase().split(' ');
+    const username = nameArr.map((name, idx) => {
+      if (idx === nameArr.length - 1) {
+        return name;
+      } else if (idx === 0) {
+        return name[0];
+      }
+    }).join('');
+
+    account.username = username;
+  })
+}
+
+
+
 /////////////////////////////////////////////////
 /////////////////////////////////////////////////
 // LECTURES
@@ -94,20 +121,17 @@ const movementsDesc = movements.map((movement, idx) => {
   return `Transaction ${idx + 1}: ${msg}`;
 });
 
-const createUsernames = (accounts) => {
-  accounts.forEach((account) => {
-    const nameArr = account.owner.toLowerCase().split(' ');
-    const username = nameArr.map((name, idx) => {
-      if (idx === nameArr.length - 1) {
-        return name;
-      } else if (idx === 0) {
-        return name[0];
-      }
-    }).join('');
 
-    account.username = username;
+const deposits = movements.filter(mov => mov > 0);
+const withdrawals = movements.filter(mov => mov < 0);
+const balance = movements.reduce((acc, cur) => {
+  return acc + cur;
+}, 0);
+
+const maxVal = (movements) => {
+  return movements.reduce((acc, cur) => {
+    return Math.max(acc, cur);
   })
 }
 
-console.log(createUsernames(accounts))
-console.log(accounts)
+console.log(maxVal(account1.movements))
