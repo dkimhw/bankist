@@ -61,6 +61,8 @@ const inputLoanAmount = document.querySelector('.form__input--loan-amount');
 const inputCloseUsername = document.querySelector('.form__input--user');
 const inputClosePin = document.querySelector('.form__input--pin');
 
+let currAccount;
+
 const createUsernames = (accounts) => {
   accounts.forEach((account) => {
     const nameArr = account.owner.toLowerCase().split(' ');
@@ -79,7 +81,7 @@ const createUsernames = (accounts) => {
 createUsernames(accounts);
 
 const displayMovements = (movements) => {
-  movements.forEach((movement, idx) => {
+  movements?.forEach((movement, idx) => {
     const transactionType = movement < 0 ? 'withdrawal' : 'deposit';
     const html = `
     <div class="movements__row">
@@ -92,22 +94,22 @@ const displayMovements = (movements) => {
   })
 };
 
-const calcDisplayPrintBalance = (movements) => {
-  const balance = movements.reduce((acc, curr) => {
+const calcDisplayPrintBalance = (acct) => {
+  acct['balance'] = acct.movements.reduce((acc, curr) => {
     return acc + curr;
   }, 0);
 
-  labelBalance.textContent = `${balance} EUR`;
+  labelBalance.textContent = `${acct['balance']} €`;
 }
 
 const calcDisplaySummary = (acct) => {
-  const incomes = acct.movements.filter(mov => mov > 0).reduce((acc, curr) => acc + curr, 0);
+  const incomes = acct?.movements.filter(mov => mov > 0).reduce((acc, curr) => acc + curr, 0);
   labelSumIn.textContent = `${incomes} €`;
 
-  const withdrawals = acct.movements.filter(mov => mov < 0).reduce((acc, curr) => acc + curr, 0);
+  const withdrawals = acct?.movements.filter(mov => mov < 0).reduce((acc, curr) => acc + curr, 0);
   labelSumOut.textContent = `${withdrawals} €`;
 
-  const interest = acct.movements
+  const interest = acct?.movements
     .filter(mov => mov > 0)
     .map(mov => mov * (acct.interestRate / 100))
     .filter((interestAmt, i, arr) => {
@@ -117,69 +119,90 @@ const calcDisplaySummary = (acct) => {
   labelSumInterest.textContent = `${interest} €`
 };
 
-containerApp.opacity = 0;
+const updateUI = (acct) => {
+  // Display movements
+  displayMovements(acct.movements);
 
+  // Display balance
+  calcDisplayPrintBalance(acct);
+
+  // Display summary
+  calcDisplaySummary(acct);
+}
+
+const closeAccountUpdateUI = () => {
+  containerApp.style.opacity = 0;
+  labelWelcome.textContent = 'Log in to get started'
+}
 
 btnLogin.addEventListener('click', (evt) => {
   evt.preventDefault();
-  let currAccount = accounts.find(acc => acc.username === inputLoginUsername.value);
+  currAccount = accounts.find(acc => acc.username === inputLoginUsername.value);
 
   if (currAccount?.pin === Number(inputLoginPin.value)) {
     // Display UI
     labelWelcome.textContent = `Welcome back, ${currAccount.owner.split(' ')[0]}`;
-    containerApp.opacity = 100;
+    containerApp.style.opacity = 100;
 
     // Clear input fields
     inputLoginUsername.value = inputLoginPin.value = '';
     inputLoginPin.blur();
 
-    // Display movements
-    displayMovements(currAccount.movements);
+    updateUI(currAccount);
+  }
+});
 
-    // Display balance
-    calcDisplayPrintBalance(currAccount.movements);
+// Transfer Functionality
+btnTransfer.addEventListener('click', (evt) => {
+  evt.preventDefault();
+  const amount = Number(inputTransferAmount.value);
+  const receiverAccount = accounts.find(acc => acc.username === inputTransferTo.value);
+  inputTransferAmount.value = inputTransferTo.value = '';
 
-    // Display summary
-    calcDisplaySummary(currAccount);
+  if (
+    amount > 0 &&
+    receiverAccount &&
+    currAccount.balance >= amount &&
+    receiverAccount?.username !== currAccount?.username
+  ) {
+    console.log('Transfer valid');
+    currAccount.movements.push(-amount);
+    receiverAccount.movements.push(amount);
+    updateUI(currAccount);
+  } else {
+    console.log('Not valid');
+  }
+});
+
+// Loan Functionality
+btnLoan.addEventListener('click', (evt) => {
+  evt.preventDefault();
+
+  // loan condition
+  const loanAmount = Number(inputLoanAmount.value);
+  let depositCondition = currAccount.movements.some(movement => movement > loanAmount * .10);
+
+  if (loanAmount > 0 && depositCondition) {
+    alert('You are approved!');
+    currAccount.movements.push(loanAmount);
+    updateUI(currAccount);
+  } else {
+    alert('You are not approved.');
   }
 })
 
-/////////////////////////////////////////////////
-/////////////////////////////////////////////////
-// LECTURES
+// Close Acct Functionality
+btnClose.addEventListener('click', (evt) => {
+  evt.preventDefault();
+  let isValidUsername = currAccount.username === inputCloseUsername.value;
+  let isValidPasscode = currAccount.pin === Number(inputClosePin.value);
+  inputCloseUsername.value = inputClosePin.value = '';
 
-const currencies = new Map([
-  ['USD', 'United States dollar'],
-  ['EUR', 'Euro'],
-  ['GBP', 'Pound sterling'],
-]);
+  if (isValidUsername && isValidPasscode) {
+    let findCurrAcctIdx = accounts.findIndex(acc => acc.username === currAccount.username);
+    accounts.splice(findCurrAcctIdx, 1);
+    currAccount = null;
+    closeAccountUpdateUI();
+  }
 
-const movements = [200, 450, -400, 3000, -650, -130, 70, 1300];
-
-const movementsDesc = movements.map((movement, idx) => {
-  const msg = movement > 0 ?  `You deposited ${movement}` : `You withdrew ${Math.abs(movement)}`;
-  return `Transaction ${idx + 1}: ${msg}`;
 });
-
-
-const deposits = movements.filter(mov => mov > 0);
-const withdrawals = movements.filter(mov => mov < 0);
-const balance = movements.reduce((acc, cur) => {
-  return acc + cur;
-}, 0);
-
-const maxVal = (movements) => {
-  return movements.reduce((acc, cur) => {
-    return Math.max(acc, cur);
-  })
-}
-
-console.log(maxVal(account1.movements));
-
-const eurToUsd = 1.1;
-const totalDepositsUSD = movements
-  .filter(mov => mov > 0)
-  .map(mov => mov * eurToUsd)
-  .reduce((acc, mov) => acc + mov, 0);
-
-console.log(totalDepositsUSD);
