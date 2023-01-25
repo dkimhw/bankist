@@ -80,8 +80,11 @@ const createUsernames = (accounts) => {
 
 createUsernames(accounts);
 
-const displayMovements = (movements) => {
-  movements?.forEach((movement, idx) => {
+const displayMovements = (movements, sort = false) => {
+  containerMovements.innerHTML = '';
+  const movs = sort ? movements.slice().sort((a, b) => a - b) : movements;
+
+  movs?.forEach((movement, idx) => {
     const transactionType = movement < 0 ? 'withdrawal' : 'deposit';
     const html = `
     <div class="movements__row">
@@ -206,3 +209,11 @@ btnClose.addEventListener('click', (evt) => {
   }
 
 });
+
+// Sort functionality
+let sortedState = false;
+btnSort.addEventListener('click', (evt) => {
+  evt.preventDefault();
+  displayMovements(currAccount.movements, !sortedState);
+  sortedState = !sortedState;
+})
