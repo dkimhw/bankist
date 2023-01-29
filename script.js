@@ -10,6 +10,18 @@ const account1 = {
   movements: [200, 450, -400, 3000, -650, -130, 70, 1300],
   interestRate: 1.2, // %
   pin: 1111,
+  movementsDates: [
+    "2019-11-18T21:31:17.178Z",
+    "2019-12-23T07:42:02.383Z",
+    "2020-01-28T09:15:04.904Z",
+    "2020-04-01T10:17:24.185Z",
+    "2020-05-08T14:11:59.604Z",
+    "2020-07-26T17:01:17.194Z",
+    "2020-07-28T23:36:17.929Z",
+    "2020-08-01T10:51:36.790Z",
+  ],
+  currency: "EUR",
+  locale: "pt-PT", // de-DE
 };
 
 const account2 = {
@@ -17,6 +29,18 @@ const account2 = {
   movements: [5000, 3400, -150, -790, -3210, -1000, 8500, -30],
   interestRate: 1.5,
   pin: 2222,
+  movementsDates: [
+    "2019-11-01T13:15:33.035Z",
+    "2019-11-30T09:48:16.867Z",
+    "2019-12-25T06:04:23.907Z",
+    "2020-01-25T14:18:46.235Z",
+    "2020-02-05T16:33:06.386Z",
+    "2020-04-10T14:43:26.374Z",
+    "2020-06-25T18:49:59.371Z",
+    "2020-07-26T12:01:20.894Z",
+  ],
+  currency: "USD",
+  locale: "en-US",
 };
 
 const account3 = {
@@ -24,6 +48,18 @@ const account3 = {
   movements: [200, -200, 340, -300, -20, 50, 400, -460],
   interestRate: 0.7,
   pin: 3333,
+  movementsDates: [
+    "2019-11-01T13:15:33.035Z",
+    "2019-11-30T09:48:16.867Z",
+    "2019-12-25T06:04:23.907Z",
+    "2020-01-25T14:18:46.235Z",
+    "2020-02-05T16:33:06.386Z",
+    "2020-04-10T14:43:26.374Z",
+    "2020-06-25T18:49:59.371Z",
+    "2020-07-26T12:01:20.894Z",
+  ],
+  currency: "USD",
+  locale: "en-US",
 };
 
 const account4 = {
@@ -31,6 +67,18 @@ const account4 = {
   movements: [430, 1000, 700, 50, 90],
   interestRate: 1,
   pin: 4444,
+  movementsDates: [
+    "2019-11-18T21:31:17.178Z",
+    "2019-12-23T07:42:02.383Z",
+    "2020-01-28T09:15:04.904Z",
+    "2020-04-01T10:17:24.185Z",
+    "2020-05-08T14:11:59.604Z",
+    "2020-07-26T17:01:17.194Z",
+    "2020-07-28T23:36:17.929Z",
+    "2020-08-01T10:51:36.790Z",
+  ],
+  currency: "EUR",
+  locale: "pt-PT", // de-DE
 };
 
 const accounts = [account1, account2, account3, account4];
@@ -61,7 +109,6 @@ const inputLoanAmount = document.querySelector('.form__input--loan-amount');
 const inputCloseUsername = document.querySelector('.form__input--user');
 const inputClosePin = document.querySelector('.form__input--pin');
 
-let currAccount;
 
 const createUsernames = (accounts) => {
   accounts.forEach((account) => {
@@ -80,15 +127,22 @@ const createUsernames = (accounts) => {
 
 createUsernames(accounts);
 
-const displayMovements = (movements, sort = false) => {
+const displayMovements = (acct, sort = false) => {
   containerMovements.innerHTML = '';
-  const movs = sort ? movements.slice().sort((a, b) => a - b) : movements;
+  const movs = sort ? acct.movements.slice().sort((a, b) => a - b) : acct.movements;
 
   movs?.forEach((movement, idx) => {
     const transactionType = movement < 0 ? 'withdrawal' : 'deposit';
+    const date = new Date(acct.movementsDates[idx]);
+    const day = `${date.getDate()}`.padStart(2, 0);
+    const month = `${date.getMonth() + 1}`.padStart(2, 0);
+    const year = date.getFullYear();
+    const displayDate = `${month}/${day}/${year}`
+
     const html = `
     <div class="movements__row">
       <div class="movements__type movements__type--${transactionType}">${idx + 1} ${transactionType}</div>
+      <div class="movements__date">${displayDate}</div>
       <div class="movements__value">${movement} €</div>
     </div>
     `;
@@ -124,7 +178,7 @@ const calcDisplaySummary = (acct) => {
 
 const updateUI = (acct) => {
   // Display movements
-  displayMovements(acct.movements);
+  displayMovements(acct);
 
   // Display balance
   calcDisplayPrintBalance(acct);
@@ -171,6 +225,8 @@ btnTransfer.addEventListener('click', (evt) => {
     console.log('Transfer valid');
     currAccount.movements.push(-amount);
     receiverAccount.movements.push(amount);
+    currAccount.movementsDates.push(new Date());
+    receiverAccount.movementsDates.push(new Date());
     updateUI(currAccount);
   } else {
     console.log('Not valid');
@@ -188,6 +244,7 @@ btnLoan.addEventListener('click', (evt) => {
   if (loanAmount > 0 && depositCondition) {
     alert('You are approved!');
     currAccount.movements.push(loanAmount);
+    currAccount.movementsDates.push(new Date());
     updateUI(currAccount);
   } else {
     alert('You are not approved.');
@@ -216,4 +273,16 @@ btnSort.addEventListener('click', (evt) => {
   evt.preventDefault();
   displayMovements(currAccount.movements, !sortedState);
   sortedState = !sortedState;
-})
+});
+
+
+let currAccount;
+
+const now = new Date();
+const day = `${now.getDate()}`.padStart(2, 0);
+const month = String(now.getMonth() + 1)?.padStart(2, 0);
+const year = now.getFullYear();
+const hour = now.getHours();
+const min = now.getMinutes();
+
+labelDate.textContent = `${month}/${day}/${year}, ${hour}:${min}`;
