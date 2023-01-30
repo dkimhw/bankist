@@ -30,17 +30,17 @@ const account2 = {
   interestRate: 1.5,
   pin: 2222,
   movementsDates: [
-    "2019-11-01T13:15:33.035Z",
-    "2019-11-30T09:48:16.867Z",
-    "2019-12-25T06:04:23.907Z",
-    "2020-01-25T14:18:46.235Z",
-    "2020-02-05T16:33:06.386Z",
-    "2020-04-10T14:43:26.374Z",
-    "2020-06-25T18:49:59.371Z",
-    "2020-07-26T12:01:20.894Z",
+    "2019-04-24T13:15:33.035Z",
+    "2019-04-30T09:48:16.867Z",
+    "2019-05-25T06:04:23.907Z",
+    "2020-06-25T14:18:46.235Z",
+    "2020-07-28T16:33:06.386Z",
+    "2020-07-30T14:43:26.374Z",
+    "2020-08-06T18:49:59.371Z",
+    "2020-08-07T12:01:20.894Z",
   ],
-  currency: "USD",
-  locale: "en-US",
+  currency: "EUR",
+  locale: "es-ES",
 };
 
 const account3 = {
@@ -127,23 +127,46 @@ const createUsernames = (accounts) => {
 
 createUsernames(accounts);
 
+const calcDaysPassed = (date1, date2) => {
+  return Math.abs(date2 - date1) / (1000 * 60 * 60 * 24);
+};
+
+const formatDate = (date) => {
+  const convertedDate = new Date(date);
+  const options = {
+    hour: 'numeric',
+    minute: 'numeric',
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric',
+  }
+
+  const intDate = new Intl.DateTimeFormat(currAccount.locale, options).format(convertedDate)
+  return intDate
+}
+
+const currencyFormat = (num) => {
+  const options = {
+    style: "currency",
+    currency: currAccount.currency
+  }
+
+  const formattedNum = new Intl.NumberFormat(currAccount.locale, options).format(num);
+  return formattedNum;
+}
+
 const displayMovements = (acct, sort = false) => {
   containerMovements.innerHTML = '';
   const movs = sort ? acct.movements.slice().sort((a, b) => a - b) : acct.movements;
 
   movs?.forEach((movement, idx) => {
     const transactionType = movement < 0 ? 'withdrawal' : 'deposit';
-    const date = new Date(acct.movementsDates[idx]);
-    const day = `${date.getDate()}`.padStart(2, 0);
-    const month = `${date.getMonth() + 1}`.padStart(2, 0);
-    const year = date.getFullYear();
-    const displayDate = `${month}/${day}/${year}`
-
+    const displayDate = formatDate(acct.movementsDates[idx]);
     const html = `
     <div class="movements__row">
       <div class="movements__type movements__type--${transactionType}">${idx + 1} ${transactionType}</div>
       <div class="movements__date">${displayDate}</div>
-      <div class="movements__value">${movement} €</div>
+      <div class="movements__value">${currencyFormat(movement)} €</div>
     </div>
     `;
 
@@ -156,7 +179,7 @@ const calcDisplayPrintBalance = (acct) => {
     return acc + curr;
   }, 0);
 
-  labelBalance.textContent = `${acct['balance']} €`;
+  labelBalance.textContent = `${currencyFormat(acct['balance'])}`;
 }
 
 const calcDisplaySummary = (acct) => {
@@ -200,6 +223,11 @@ btnLogin.addEventListener('click', (evt) => {
     // Display UI
     labelWelcome.textContent = `Welcome back, ${currAccount.owner.split(' ')[0]}`;
     containerApp.style.opacity = 100;
+
+    // Create current date and time
+    const now = new Date();
+    labelDate.textContent = formatDate(now);
+
 
     // Clear input fields
     inputLoginUsername.value = inputLoginPin.value = '';
@@ -277,12 +305,3 @@ btnSort.addEventListener('click', (evt) => {
 
 
 let currAccount;
-
-const now = new Date();
-const day = `${now.getDate()}`.padStart(2, 0);
-const month = String(now.getMonth() + 1)?.padStart(2, 0);
-const year = now.getFullYear();
-const hour = now.getHours();
-const min = now.getMinutes();
-
-labelDate.textContent = `${month}/${day}/${year}, ${hour}:${min}`;
