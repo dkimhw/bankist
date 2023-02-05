@@ -166,7 +166,7 @@ const displayMovements = (acct, sort = false) => {
     <div class="movements__row">
       <div class="movements__type movements__type--${transactionType}">${idx + 1} ${transactionType}</div>
       <div class="movements__date">${displayDate}</div>
-      <div class="movements__value">${currencyFormat(movement)} €</div>
+      <div class="movements__value">${currencyFormat(movement)}</div>
     </div>
     `;
 
@@ -184,10 +184,10 @@ const calcDisplayPrintBalance = (acct) => {
 
 const calcDisplaySummary = (acct) => {
   const incomes = acct?.movements.filter(mov => mov > 0).reduce((acc, curr) => acc + curr, 0);
-  labelSumIn.textContent = `${incomes} €`;
+  labelSumIn.textContent = `${currencyFormat(incomes)}`;
 
   const withdrawals = acct?.movements.filter(mov => mov < 0).reduce((acc, curr) => acc + curr, 0);
-  labelSumOut.textContent = `${withdrawals} €`;
+  labelSumOut.textContent = `${currencyFormat(withdrawals)}`;
 
   const interest = acct?.movements
     .filter(mov => mov > 0)
@@ -196,7 +196,7 @@ const calcDisplaySummary = (acct) => {
       return interestAmt >= 1;
     })
     .reduce((acc, curr) => acc + curr, 0);
-  labelSumInterest.textContent = `${interest} €`
+  labelSumInterest.textContent = `${currencyFormat(interest)}`
 };
 
 const updateUI = (acct) => {
@@ -208,6 +208,29 @@ const updateUI = (acct) => {
 
   // Display summary
   calcDisplaySummary(acct);
+}
+
+const startLogOutTimer = () => {
+  let time = 120;
+
+  const tick = () => {
+    if (time === 0) {
+      clearInterval(timer);
+      labelWelcome.textContent = 'Log in to get started';
+      containerApp.style.opacity = 0;
+    }
+
+    const min = String(Math.floor(time / 60)).padStart(2, 0);
+    const seconds = String(time % 60).padStart(2, 0);
+
+    labelTimer.textContent = `${min}:${seconds}`;
+    time--;
+
+  }
+
+  tick();
+  const timer = setInterval(tick, 1000);
+  return timer;
 }
 
 const closeAccountUpdateUI = () => {
@@ -233,6 +256,13 @@ btnLogin.addEventListener('click', (evt) => {
     inputLoginUsername.value = inputLoginPin.value = '';
     inputLoginPin.blur();
 
+    if (logOutTimer) {
+      clearInterval(logOutTimer);
+    }
+
+    logOutTimer = startLogOutTimer();
+
+
     updateUI(currAccount);
   }
 });
@@ -250,14 +280,13 @@ btnTransfer.addEventListener('click', (evt) => {
     currAccount.balance >= amount &&
     receiverAccount?.username !== currAccount?.username
   ) {
-    console.log('Transfer valid');
     currAccount.movements.push(-amount);
     receiverAccount.movements.push(amount);
     currAccount.movementsDates.push(new Date());
     receiverAccount.movementsDates.push(new Date());
     updateUI(currAccount);
-  } else {
-    console.log('Not valid');
+    clearInterval(logOutTimer);
+    startLogOutTimer();
   }
 });
 
@@ -270,10 +299,15 @@ btnLoan.addEventListener('click', (evt) => {
   let depositCondition = currAccount.movements.some(movement => movement > loanAmount * .10);
 
   if (loanAmount > 0 && depositCondition) {
-    alert('You are approved!');
-    currAccount.movements.push(loanAmount);
-    currAccount.movementsDates.push(new Date());
-    updateUI(currAccount);
+    alert('Processing your loan.')
+    setTimeout(() => {
+      alert('You are approved!');
+      currAccount.movements.push(loanAmount);
+      currAccount.movementsDates.push(new Date());
+      updateUI(currAccount);
+      clearInterval(logOutTimer);
+      startLogOutTimer();
+    }, 2000);
   } else {
     alert('You are not approved.');
   }
@@ -304,4 +338,4 @@ btnSort.addEventListener('click', (evt) => {
 });
 
 
-let currAccount;
+let currAccount, logOutTimer;
