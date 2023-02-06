@@ -338,4 +338,5 @@ btnSort.addEventListener('click', (evt) => {
 });
 
 
+// Global variables that needs to be accessed across multiple callback functions
 let currAccount, logOutTimer;
