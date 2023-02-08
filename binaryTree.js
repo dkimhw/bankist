@@ -17,7 +17,7 @@ class BinarySearchTree {
       If left is null, set this.left to the input value
 
       If value is greater than root, go right
-      If right is null, set this.left to the input value
+      If right is null, set this.right to the input value
       If right is not null:
         - compare values
           - if greater, go right
@@ -25,24 +25,32 @@ class BinarySearchTree {
 
       If === then the value exists so we don't do anything
     */
-    currNode = this.root;
-    while (currNode) {
-      if (currNode.value > value) {
-        if (currNode.right === null) {
-          currNode.right = new Node(value);
-          break;
+    let currNode = this.root;
+    if (currNode === null) {
+      this.root  = new Node(value);
+    } else {
+      while (currNode) {
+        if (currNode.value < value) {
+          if (currNode.right === null) {
+            currNode.right = new Node(value);
+            break;
+          } else {
+            currNode = currNode.right;
+          }
+        } else if (currNode.value > value) {
+          if (currNode.left === null) {
+            currNode.left = new Node(value);
+            break;
+          } else {
+            currNode = currNode.left;
+          }
         } else {
-          currNode = this.currNode.right;
+          break
         }
-      } else if (currNode.value < value) {
-        currNode = this.currNode.left
-      } else {
-        break
       }
     }
-
-
   }
+
   lookup(value){
     //Code here
   }
@@ -57,8 +65,10 @@ tree.insert(20)
 tree.insert(170)
 tree.insert(15)
 tree.insert(1)
-JSON.stringify(traverse(tree.root))
-
+console.log(JSON.stringify(traverse(tree.root)));
+// console.log(tree);
+console.log(tree.root.left);
+console.log(tree.root.right);
 //     9
 //  4     20
 //1  6  15  170
