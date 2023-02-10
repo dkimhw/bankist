@@ -50,11 +50,22 @@ btnScrollTo.addEventListener('click', (evt) => {
 
 // Page navigation
 
-document.querySelectorAll('.nav__link').forEach((li) => {
-  li.addEventListener('click', (evt) => {
-    evt.preventDefault();
-    const id = li.getAttribute('href');
+// document.querySelectorAll('.nav__link').forEach((li) => {
+//   li.addEventListener('click', (evt) => {
+//     evt.preventDefault();
+//     const id = li.getAttribute('href');
+//     const section = document.querySelector(id);
+//     section.scrollIntoView({ behavior: 'smooth' });
+//   });
+// });
+
+// 1. Add event listener to common parent element
+// 2. Determine what element originated the event
+document.querySelector('.nav__links').addEventListener('click', (evt) => {
+  evt.preventDefault();
+  if (evt.target.classList.contains('nav__link')) {
+    const id = evt.target.getAttribute('href');
     const section = document.querySelector(id);
     section.scrollIntoView({ behavior: 'smooth' });
-  });
+  }
 });
