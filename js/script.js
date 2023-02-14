@@ -70,6 +70,8 @@ document.querySelector('.nav__links').addEventListener('click', (evt) => {
   }
 });
 
+
+// Tab components
 const tabs = document.querySelectorAll('.operations__tab');
 const tabsContainer = document.querySelector('.operations__tab-container');
 const tabsContent = document.querySelectorAll('.operations__content');
@@ -85,3 +87,67 @@ tabsContainer.addEventListener('click', (evt) => {
   document.querySelector(`.operations__content--${clicked.dataset.tab}`)
     .classList.add('operations__content--active');
 });
+
+// Menu fade animation
+const nav = document.querySelector('.nav');
+
+const handleNavbarHover3 = (evt) => {
+  console.log(this);
+  console.log(evt);
+
+  if (evt.target.classList.contains('nav__link')) {
+    const link = evt.target;
+    const siblings = link.closest('.nav').querySelectorAll('.nav__link');
+    const logo = link.closest('.nav').querySelector('img');
+
+    siblings.forEach(el => {
+      if (el !== link) {
+        el.style.opacity = this;
+      }
+    });
+
+    logo.style.opacity = this;
+  }
+}
+
+
+const handleNavbarHover2 = (evt) => {
+  console.log(this);
+  console.log(evt);
+
+  if (evt.target.classList.contains('nav__link')) {
+    const link = evt.target;
+    const siblings = link.closest('.nav').querySelectorAll('.nav__link');
+    const logo = link.closest('.nav').querySelector('img');
+
+    siblings.forEach(el => {
+      if (el !== link) {
+        el.style.opacity = this;
+      }
+    });
+
+    logo.style.opacity = this;
+  }
+}
+
+const handleNavbarHover = function(evt) {
+  console.log(this);
+  console.log(evt);
+  if (evt.target.classList.contains('nav__link')) {
+    const link = evt.target;
+    const siblings = link.closest('.nav').querySelectorAll('.nav__link');
+    const logo = link.closest('.nav').querySelector('img');
+
+    siblings.forEach(el => {
+      if (el !== link) {
+        el.style.opacity = this;
+      }
+    });
+
+    logo.style.opacity = this;
+  }
+}
+
+nav.addEventListener('mouseover', handleNavbarHover2.bind(0.5));
+
+nav.addEventListener('mouseout', handleNavbarHover.bind(1));
