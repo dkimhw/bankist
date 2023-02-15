@@ -110,7 +110,6 @@ const handleNavbarHover3 = (evt) => {
   }
 }
 
-
 const handleNavbarHover2 = (evt) => {
   console.log(this);
   console.log(evt);
@@ -151,3 +150,29 @@ const handleNavbarHover = function(evt) {
 nav.addEventListener('mouseover', handleNavbarHover2.bind(0.5));
 
 nav.addEventListener('mouseout', handleNavbarHover.bind(1));
+
+// const initialCoords = section1.getBoundingClientRect();
+// window.addEventListener('scroll', function() {
+//   if (this.window.scrollY > initialCoords.top) {
+//     nav.classList.add('sticky');
+//   } else {
+//     nav.classList.remove('sticky');
+//   }
+// })
+
+const stickyNav = function (entries) {
+  const [entry] = entries;
+  if (!entry.isIntersecting) {
+    nav.classList.add('sticky');
+  } else {
+    nav.classList.remove('sticky');
+  }
+};
+
+const header = document.querySelector('.header');
+const headerObserver = new IntersectionObserver(stickyNav, {
+  root: null,
+  threshold: 0, // 0% of the header is visible we want to go to sticky nav
+  rootMargin: '-90px'
+});
+headerObserver.observe(header);
