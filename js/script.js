@@ -299,3 +299,11 @@ dotContainer.addEventListener('click', function (evt) {
     activateDot(slide);
   }
 });
+
+document.addEventListener('DOMContentLoaded', function(evt) {
+  console.log('HTML parsed and DOM tree built!');
+});
+
+window.addEventListener('load', function(evt) {
+  console.log('Page fully loaded', e);
+});
