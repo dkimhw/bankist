@@ -9,7 +9,7 @@ const Person = function(firstName, birthYear) {
 
   // Don't create methods in constructor functions - every object will have this function - could impact performance
   // Instead - use prototypes
-  this.calcAge = function() {
+  this.calcAgeTest = function() {
     console.log(2023 - this.birthYear);
   }
 }
@@ -25,3 +25,29 @@ const person2 = new Person('Matilda', '1991');
 console.log(person2);
 
 console.log("returns true person1 is an instance of Person: ", person1 instanceof Person);
+
+// Prototypes
+
+// All the objects that are created through the Person constructor
+// will inherit all the methods and properties that are defined on the prototype property
+Person.prototype.calcAge = function() {
+  // this is set to the object that is calling the function
+  console.log(2023 - this.birthYear);
+}
+
+person1.calcAge();
+person2.calcAge();
+
+console.log(person1.__proto__); // prototype of person1
+// The person1 object's prototype property is the same as the prototype property of the Person constructor function
+console.log(person1.__proto__ === Person.prototype);
+console.log(Person.prototype.isPrototypeOf(person1));
+console.log(Person.prototype.isPrototypeOf(Person)); // false
+
+/*
+The `new` keyowrd sets the proto property on the object to the prototype property
+of the constructor function. And so this is how JavaScript knows internally
+that the Jonas object is connected to `Person.prototype`
+
+
+*/

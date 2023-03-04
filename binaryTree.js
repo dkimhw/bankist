@@ -53,8 +53,47 @@ class BinarySearchTree {
 
   lookup(value){
     //Code here
+    if (!this.root) {
+      return false;
+    }
+
+    let currentNode = this.root;
+    while(currentNode) {
+      if(value < currentNode.value) {
+        currentNode = currentNode.left;
+      } else if (value > currentNode.value) {
+        currentNode = currentNode.right;
+      } else if (currentNode.value === value) {
+        return currentNode;
+      }
+    }
+
+    return false;
   }
+
   // remove
+  remove(value) {
+    if (!this.root) {
+      return false;
+    }
+
+    // Simplest scenario: if you find the node and has no children, just remove it
+    let currentNode = this.root;
+    let parentNode = null;
+
+    while (currentNode) {
+      if(value < currentNode.value) {
+        parentNode = currentNode;
+        currentNode = currentNode.left;
+      } else if (value > currentNode.value) {
+        parentNode = currentNode;
+        currentNode = currentNode.right;
+      } else if (currentNode.value === value) {
+        // remove node
+        // Option 1: No right child
+      }
+    }
+  }
 }
 
 const tree = new BinarySearchTree();
@@ -65,10 +104,11 @@ tree.insert(20)
 tree.insert(170)
 tree.insert(15)
 tree.insert(1)
-console.log(JSON.stringify(traverse(tree.root)));
+// console.log(JSON.stringify(traverse(tree.root)));
 // console.log(tree);
-console.log(tree.root.left);
-console.log(tree.root.right);
+// console.log(tree.root.left);
+// console.log(tree.root.right);
+console.log(tree.lookup(-1));
 //     9
 //  4     20
 //1  6  15  170
